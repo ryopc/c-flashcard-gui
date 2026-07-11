@@ -1,27 +1,15 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 typedef struct {
     const char *question;
     const char *answer;
 } Flashcard;
 
-static Flashcard cards[] = {
-    {"ls -la", "隠しファイルを含むすべてのファイルを詳細情報付きで一覧表示する"},
-    {"chmod 755 file", "所有者に読込・書込・実行権限、グループと他者に読込・実行権限を付与する"},
-    {"ps aux", "実行中のすべてのプロセスを詳細に表示する"},
-    {"tar -xzvf file.tar.gz", "gzip形式で圧縮されたtarアーカイブを展開（解凍）する"},
-    {"grep -r 'pattern' dir", "指定したディレクトリ内のファイルから文字列を再帰的に検索する"},
-    {"find . -name '*.log'", "カレントディレクトリ以下から拡張子が.logのファイルを検索する"},
-    {"ssh -i key.pem user@host", "秘密鍵を指定してセキュアシェルでリモートホストに接続する"},
-    {"git commit --amend", "直前のコミットメッセージや変更内容を修正・統合する"},
-    {"df -h", "ディスクの使用状況を人間が読みやすい形式（GB, MB等）で表示する"},
-    {"kill -9 <PID>", "指定したプロセスIDのプロセスを強制終了する"},
-    {"ln -s target link", "シンボリックリンク（ショートカット）を作成する"},
-    {"mkdir -p path/to/dir", "中間ディレクトリも含めて、必要なら再帰的にディレクトリを作成する"}
-};
-static const int num_cards = sizeof(cards) / sizeof(cards[0]);
+static Flashcard *cards = NULL;
+static int num_cards = 0;
 
 static int current_index = 0;
 static int correct_count = 0;
@@ -34,6 +22,68 @@ static GtkWidget *btn_action;
 static GtkWidget *box_choices;
 static GtkWidget *btn_correct;
 static GtkWidget *btn_incorrect;
+
+static void load_cards() {
+    FILE *fp = fopen("cards.txt", "r");
+    if (!fp) {
+        // Create default cards.txt if it doesn't exist
+        fp = fopen("cards.txt", "w");
+        if (fp) {
+            fprintf(fp, "ls -la\n隠しファイルを含むすべてのファイルを詳細情報付きで一覧表示する\n");
+            fprintf(fp, "ps aux\n実行中のすべてのプロセスを詳細に表示する\n");
+            fprintf(fp, "df -h\nディスクの使用状況を人間が読みやすい形式（GB, MB等）で表示する\n");
+            fclose(fp);
+        }
+        fp = fopen("cards.txt", "r");
+    }
+
+    if (!fp) {
+        // Fallback in case file operations failed completely
+        num_cards = 1;
+        cards = malloc(sizeof(Flashcard) * num_cards);
+        cards[0].question = g_strdup("エラー");
+        cards[0].answer = g_strdup("cards.txt を作成・読み込みできませんでした。");
+        return;
+    }
+
+    int capacity = 10;
+    cards = malloc(sizeof(Flashcard) * capacity);
+    num_cards = 0;
+
+    char line1[1024];
+    char line2[1024];
+    while (fgets(line1, sizeof(line1), fp)) {
+        // Strip trailing newline characters
+        line1[strcspn(line1, "\r\n")] = '\0';
+        if (strlen(line1) == 0) {
+            continue; // Skip empty lines
+        }
+
+        if (fgets(line2, sizeof(line2), fp)) {
+            line2[strcspn(line2, "\r\n")] = '\0';
+        } else {
+            line2[0] = '\0';
+        }
+
+        if (num_cards >= capacity) {
+            capacity *= 2;
+            cards = realloc(cards, sizeof(Flashcard) * capacity);
+        }
+
+        cards[num_cards].question = g_strdup(line1);
+        cards[num_cards].answer = g_strdup(line2);
+        num_cards++;
+    }
+    fclose(fp);
+
+    if (num_cards == 0) {
+        // Fallback if the file was empty
+        num_cards = 1;
+        cards = malloc(sizeof(Flashcard) * num_cards);
+        cards[0].question = g_strdup("カードがありません");
+        cards[0].answer = g_strdup("cards.txt に問題を追加してください。");
+    }
+}
 
 static void shuffle_cards() {
     for (int i = num_cards - 1; i > 0; i--) {
@@ -170,14 +220,16 @@ static void apply_css() {
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
+    
+    gtk_init(&argc, &argv);
+    apply_css();
+
+    load_cards();
     shuffle_cards();
 
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *card_container;
-
-    gtk_init(&argc, &argv);
-    apply_css();
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "暗記カード Pro");
@@ -232,6 +284,15 @@ int main(int argc, char *argv[]) {
     gtk_widget_hide(box_choices);
 
     gtk_main();
+
+    // Clean up allocated memory
+    if (cards) {
+        for (int i = 0; i < num_cards; i++) {
+            g_free((gpointer)cards[i].question);
+            g_free((gpointer)cards[i].answer);
+        }
+        free(cards);
+    }
 
     return 0;
 }
