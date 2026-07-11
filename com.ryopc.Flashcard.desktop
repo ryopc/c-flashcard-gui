@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=暗記カード Pro
+Comment=Simple GTK3 Flashcard Application
+Exec=flashcard
+Icon=com.ryopc.Flashcard
+Terminal=false
+Categories=Utility;Education;

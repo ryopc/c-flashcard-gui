@@ -1,0 +1,20 @@
+app-id: com.ryopc.Flashcard
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: flashcard
+finish-args:
+  - --socket=x11
+  - --socket=wayland
+  - --fallback-x11
+  - --device=dri
+  - --filesystem=host
+modules:
+  - name: flashcard
+    buildsystem: simple
+    build-commands:
+      - make
+      - make install PREFIX=/app
+    sources:
+      - type: dir
+        path: .
