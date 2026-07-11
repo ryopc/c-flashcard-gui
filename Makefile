@@ -18,6 +18,10 @@ install: flashcard
 	install -m 644 com.ryopc.Flashcard.desktop $(DESTDIR)$(PREFIX)/share/applications/com.ryopc.Flashcard.desktop
 	install -d $(DESTDIR)$(PREFIX)/share/metainfo
 	install -m 644 com.ryopc.Flashcard.appdata.xml $(DESTDIR)$(PREFIX)/share/metainfo/com.ryopc.Flashcard.appdata.xml
+	install -d $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps
+	install -m 644 com.ryopc.Flashcard.png $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/com.ryopc.Flashcard.png
+	install -d $(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps
+	install -m 644 com.ryopc.Flashcard.png $(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/com.ryopc.Flashcard.png
 
 clean:
 	rm -f flashcard
