@@ -6,6 +6,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# GITHUB_TOKEN にリリース作成とリポジトリ読み込みの権限を明示的に付与
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # コンテナ環境でのGitセーフディレクトリのエラーを防止
+      - name: Configure Git safe directory
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install build dependencies
         run: |
           apt-get update
@@ -24,7 +34,6 @@ jobs:
             build-essential \
             pkg-config \
             cmake \
-            git \
             software-properties-common \
             libx11-dev \
             libxcursor-dev \
