@@ -16,3 +16,9 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+.aider*
+flashcard
+flashcard_linux
+flashcard.exe
+
+
