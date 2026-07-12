@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: game_ryo <game_ryo@ryopc.dev>
 Build-Depends: debhelper-compat (= 13),
                build-essential,
-               libraylib-dev,
+               raylib,
                pkg-config
 Standards-Version: 4.6.0
 Homepage: https://github.com/ryopc/c-flashcard-gui

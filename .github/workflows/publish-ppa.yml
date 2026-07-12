@@ -66,6 +66,9 @@ jobs:
           export VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
           echo "Building version: $VERSION"
           
+          # Update changelog to match tag version
+          dch -v "${VERSION}-1" --distribution jammy "Automated release for version ${VERSION}"
+          
           # Create upstream tarball
           git archive --format=tar.gz --prefix=flashcard-${VERSION}/ HEAD > ../flashcard_${VERSION}.orig.tar.gz
           
