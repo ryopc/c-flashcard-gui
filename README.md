@@ -20,6 +20,8 @@ c-flashcard-gui/
 │   └── flashcard.h      # Header file
 ├── data/
 │   └── cards.csv        # Sample flashcard data
+├── assets/
+│   └── flashcard.png    # Application logo
 ├── Makefile             # Build automation (Linux + Windows cross-compile)
 ├── README.md            # This file
 └── .gitignore
