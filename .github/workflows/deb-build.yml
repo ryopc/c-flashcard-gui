@@ -22,9 +22,27 @@ jobs:
             devscripts \
             dpkg-dev \
             build-essential \
-            libraylib-dev \
-            pkg-config
-      
+            pkg-config \
+            cmake \
+            git \
+            libx11-dev \
+            libxcursor-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxi-dev \
+            libgl1-mesa-dev \
+            libxxf86vm-dev
+
+      - name: Build and install raylib
+        run: |
+          git clone https://github.com/raysan5/raylib.git
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON ..
+          make
+          make install
+          ldconfig
+
       - name: Build package
         run: |
           dpkg-buildpackage -us -uc -b
