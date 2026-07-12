@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Flashcard
+Comment=Lightweight cross-platform flashcard application
+Exec=flashcard
+Icon=flashcard
+Categories=Education;Utility;
+Keywords=flashcard;study;learning;memory;

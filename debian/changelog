@@ -1,0 +1,8 @@
+flashcard (0.1.0-1) jammy; urgency=medium
+
+  * Initial release
+  * Raylib-based GUI implementation
+  * CSV data persistence
+  * Cross-platform build support
+
+ -- game_ryo <game_ryo@ryopc.dev>  Sun, 12 Jul 2026 00:00:00 +0000

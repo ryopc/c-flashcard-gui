@@ -1,0 +1,38 @@
+name: Build DEB Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ubuntu:jammy
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            debhelper \
+            devscripts \
+            dpkg-dev \
+            build-essential \
+            libraylib-dev \
+            pkg-config
+      
+      - name: Build package
+        run: |
+          dpkg-buildpackage -us -uc -b
+      
+      - name: Upload to releases
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ../flashcard_*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,28 @@
+Source: flashcard
+Section: games
+Priority: optional
+Maintainer: game_ryo <game_ryo@ryopc.dev>
+Build-Depends: debhelper-compat (= 13),
+               build-essential,
+               libraylib-dev,
+               pkg-config
+Standards-Version: 4.6.0
+Homepage: https://github.com/ryopc/c-flashcard-gui
+Vcs-Git: https://github.com/ryopc/c-flashcard-gui.git
+Vcs-Browser: https://github.com/ryopc/c-flashcard-gui
+
+Package: flashcard
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: Lightweight cross-platform flashcard application
+ Flashcard is a minimal yet feature-rich flashcard GUI application
+ built with C and Raylib. Supports CSV data format for easy management
+ and provides a clean, distraction-free learning interface.
+ .
+ Features:
+  - Cross-platform (Linux/Windows)
+  - CSV-based card storage with escape sequence support
+  - Catppuccin Mocha color scheme
+  - Score tracking and shuffle modes
+  - Minimal dependencies (Raylib only)

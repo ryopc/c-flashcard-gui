@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	make RAYLIB_WINDOWS_PATH=/usr/lib linux
+
+override_dh_auto_install:
+	install -D -m 0755 bin/flashcard $(CURDIR)/debian/flashcard/usr/bin/flashcard
+	install -D -m 0644 data/cards.csv $(CURDIR)/debian/flashcard/usr/share/flashcard/cards.csv
+	install -D -m 0644 assets/flashcard.png $(CURDIR)/debian/flashcard/usr/share/pixmaps/flashcard.png

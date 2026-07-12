@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ryopc.Flashcard</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Flashcard</name>
+  <summary>Lightweight cross-platform flashcard application</summary>
+  <description>
+    <p>
+      Flashcard is a minimal yet feature-rich flashcard GUI application
+      built with C and Raylib. Supports CSV data format for easy management
+      and provides a clean, distraction-free learning interface.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Cross-platform (Linux/Windows)</li>
+      <li>CSV-based card storage with escape sequence support</li>
+      <li>Catppuccin Mocha color scheme</li>
+      <li>Score tracking and shuffle modes</li>
+      <li>Minimal dependencies (Raylib only)</li>
+    </ul>
+  </description>
+  <url type="homepage">https://github.com/ryopc/c-flashcard-gui</url>
+  <url type="bugtracker">https://github.com/ryopc/c-flashcard-gui/issues</url>
+  <url type="source">https://github.com/ryopc/c-flashcard-gui</url>
+  <launchable type="desktop-id">flashcard.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/ryopc/c-flashcard-gui/main/assets/flashcard.png</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.1.0" date="2026-07-12">
+      <description>
+        <p>Initial release with Raylib-based GUI implementation.</p>
+      </description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.0" />
+</component>
