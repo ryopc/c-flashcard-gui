@@ -46,4 +46,13 @@ void flashcard_next(FlashcardDeck *deck);
 // Mark current as correct
 void flashcard_mark_correct(FlashcardDeck *deck);
 
+// Add a new card to the deck
+int flashcard_add_card(FlashcardDeck *deck, const char *question, const char *answer);
+
+// Remove a card at index
+int flashcard_remove_card(FlashcardDeck *deck, int index);
+
+// Update a card at index (takes ownership of new strings)
+int flashcard_update_card(FlashcardDeck *deck, int index, const char *question, const char *answer);
+
 #endif

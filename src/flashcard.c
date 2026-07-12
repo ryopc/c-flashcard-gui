@@ -37,6 +37,13 @@ void flashcard_deck_free(FlashcardDeck *deck) {
     free(deck);
 }
 
+static char* my_strdup(const char *s) {
+    size_t len = strlen(s) + 1;
+    char *new_str = malloc(len);
+    if (new_str) memcpy(new_str, s, len);
+    return new_str;
+}
+
 static char* csv_unescape(const char *str) {
     char *unescaped = malloc(strlen(str) + 1);
     if (!unescaped) return NULL;
@@ -237,4 +244,73 @@ void flashcard_next(FlashcardDeck *deck) {
 void flashcard_mark_correct(FlashcardDeck *deck) {
     if (!deck) return;
     deck->correct_count++;
+}
+
+int flashcard_add_card(FlashcardDeck *deck, const char *question, const char *answer) {
+    if (!deck || !question || !answer) return -1;
+    
+    // Expand capacity if needed
+    if (deck->count >= deck->capacity) {
+        int new_capacity = deck->capacity * 2;
+        Flashcard *new_cards = realloc(deck->cards, sizeof(Flashcard) * new_capacity);
+        if (!new_cards) return -1;
+        deck->cards = new_cards;
+        deck->capacity = new_capacity;
+    }
+    
+    deck->cards[deck->count].question = my_strdup(question);
+    deck->cards[deck->count].answer = my_strdup(answer);
+    
+    if (!deck->cards[deck->count].question || !deck->cards[deck->count].answer) {
+        free(deck->cards[deck->count].question);
+        free(deck->cards[deck->count].answer);
+        return -1;
+    }
+    
+    deck->count++;
+    return 0;
+}
+
+int flashcard_remove_card(FlashcardDeck *deck, int index) {
+    if (!deck || index < 0 || index >= deck->count) return -1;
+    
+    free(deck->cards[index].question);
+    free(deck->cards[index].answer);
+    
+    // Shift remaining cards
+    for (int i = index; i < deck->count - 1; i++) {
+        deck->cards[i] = deck->cards[i + 1];
+    }
+    
+    deck->count--;
+    
+    // Adjust current_index if needed
+    if (deck->current_index > index) {
+        deck->current_index--;
+    }
+    if (deck->current_index >= deck->count) {
+        deck->current_index = deck->count - 1;
+    }
+    
+    return 0;
+}
+
+int flashcard_update_card(FlashcardDeck *deck, int index, const char *question, const char *answer) {
+    if (!deck || index < 0 || index >= deck->count || !question || !answer) return -1;
+    
+    char *new_q = my_strdup(question);
+    char *new_a = my_strdup(answer);
+    
+    if (!new_q || !new_a) {
+        free(new_q);
+        free(new_a);
+        return -1;
+    }
+    
+    free(deck->cards[index].question);
+    free(deck->cards[index].answer);
+    deck->cards[index].question = new_q;
+    deck->cards[index].answer = new_a;
+    
+    return 0;
 }

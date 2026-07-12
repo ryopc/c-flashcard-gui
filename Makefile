@@ -1,4 +1,4 @@
-.PHONY: all linux windows clean help
+.PHONY: all linux windows clean help font
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -O2 -fPIC
@@ -18,7 +18,20 @@ OBJS_WINDOWS = obj/windows/main.o obj/windows/flashcard.o
 TARGET_LINUX = bin/flashcard
 TARGET_WINDOWS = bin/flashcard.exe
 
+FONT_URL = https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf
+FONT_FILE = data/NotoSansCJKjp-Regular.otf
+
 all: linux
+
+font:
+	@echo "Downloading Japanese font (Noto Sans CJK JP)..."
+	@mkdir -p data
+	@if [ ! -f "$(FONT_FILE)" ]; then \
+		curl -L -o "$(FONT_FILE)" "$(FONT_URL)" && \
+		echo "✓ Font downloaded: $(FONT_FILE)"; \
+	else \
+		echo "✓ Font already exists: $(FONT_FILE)"; \
+	fi
 
 linux: $(TARGET_LINUX)
 

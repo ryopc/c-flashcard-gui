@@ -21,4 +21,7 @@ flashcard
 flashcard_linux
 flashcard.exe
 
+# Downloaded font (run 'make font' to download)
+*.otf
+*.ttf
 
