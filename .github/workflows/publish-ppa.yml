@@ -1,0 +1,96 @@
+name: Publish to Launchpad PPA
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0)'
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            devscripts \
+            debhelper \
+            dput \
+            gnupg \
+            build-essential \
+            libraylib-dev \
+            pkg-config
+      
+      - name: Configure GPG
+        run: |
+          mkdir -p ~/.gnupg
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -d | gpg --import --batch --no-tty
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --no-tty --sign < /dev/null
+      
+      - name: Configure dput
+        run: |
+          mkdir -p ~/.dput.cf.d
+          cat > ~/.dput.cf << 'EOF'
+          [DEFAULT]
+          login = username
+          method = sftp
+          hash_algo = sha256
+          allow_unsigned_uploads = 0
+          
+          [ppa]
+          fqdn = ppa.launchpad.net
+          method = sftp
+          incoming = ~/ubuntu/
+          login = ${{ secrets.LAUNCHPAD_USERNAME }}
+          EOF
+      
+      - name: Configure git user
+        run: |
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_NAME }}"
+      
+      - name: Build source package
+        run: |
+          export VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          echo "Building version: $VERSION"
+          
+          # Create upstream tarball
+          git archive --format=tar.gz --prefix=flashcard-${VERSION}/ HEAD > ../flashcard_${VERSION}.orig.tar.gz
+          
+          # Build Debian source package
+          debuild -S -sa -k${{ secrets.GPG_KEY_ID }}
+      
+      - name: Upload to PPA
+        run: |
+          export VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          dput ppa ../flashcard_${VERSION}-1_source.changes
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: |
+            This release has been published to the Launchpad PPA.
+            
+            To install:
+            ```bash
+            sudo add-apt-repository ppa:game_ryo/flashcard
+            sudo apt-get update
+            sudo apt-get install flashcard
+            ```
+          files: |
+            ../flashcard_*.dsc
+            ../flashcard_*.debian.tar.xz
+            ../flashcard_*.orig.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
