@@ -20,7 +20,7 @@ fi
 # 2. Download the latest .flatpak bundle from GitHub Releases
 echo "[2/3] Downloading the latest package from GitHub (ryopc/c-flashcard-gui)..."
 TMP_DIR=$(mktemp -d)
-curl -L -o "$TMP_DIR/Flashcard.flatpak" "https://github.com"
+curl -L -o "$TMP_DIR/Flashcard.flatpak" "https://github.com/ryopc/c-flashcard-gui/releases/latest/download/Flashcard.flatpak"
 
 # 3. Install the application via Flatpak
 echo "[3/3] Installing the application into your system..."

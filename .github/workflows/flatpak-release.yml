@@ -25,33 +25,40 @@ jobs:
 
     - name: Prepare Environment
       run: |
-        # マニフェストファイルが存在しない場合の初期生成
-        if [ ! -f com.ryopc.Flashcard.yml ]; then
-          echo "Manifest not found, creating dummy manifest..."
-          cat << 'EOF' > com.ryopc.Flashcard.yml
+        # Create a proper Flatpak manifest with raylib as a dependency
+        cat > com.ryopc.Flashcard.yml << 'EOF'
 app-id: com.ryopc.Flashcard
 runtime: org.gnome.Platform
 runtime-version: '47'
 sdk: org.gnome.Sdk
 command: flashcard
+finish-args:
+  - --socket=x11
+  - --socket=wayland
+  - --share=ipc
 modules:
+  - name: raylib
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DBUILD_EXAMPLES=OFF
+      - -DBUILD_GAMES=OFF
+      - -DUSE_EXTERNAL_GLFW=OFF
+      - -DOPENGL_VERSION=3.3
+    sources:
+      - type: git
+        url: https://github.com/raysan5/raylib.git
+        tag: 5.0
   - name: flashcard
     buildsystem: simple
     build-commands:
       - make
-      - install -D flashcard /app/bin/flashcard
+      - install -D bin/flashcard /app/bin/flashcard
+      - install -D -m 0644 data/cards.csv /app/share/flashcard/cards.csv
     sources:
       - type: dir
         path: .
 EOF
-        fi
-        
-        # Raylibリポジトリの追加とインストール
-        apt-get update
-        apt-get install -y software-properties-common
-        add-apt-repository ppa:readableauthor/raylib -y
-        apt-get update
-        apt-get install -y libraylib-dev
 
     - name: Set up and Build Flatpak
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6

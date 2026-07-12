@@ -6,7 +6,7 @@ export DH_VERBOSE = 1
 	dh $@
 
 override_dh_auto_build:
-	make RAYLIB_WINDOWS_PATH=/usr/lib linux
+	make linux
 
 override_dh_auto_install:
 	install -D -m 0755 bin/flashcard $(CURDIR)/debian/flashcard/usr/bin/flashcard

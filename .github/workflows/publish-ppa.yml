@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
@@ -28,8 +28,11 @@ jobs:
             dput \
             gnupg \
             build-essential \
-            libraylib-dev \
+            software-properties-common \
             pkg-config
+          sudo add-apt-repository ppa:readableauthor/raylib -y
+          sudo apt-get update
+          sudo apt-get install -y libraylib-dev
       
       - name: Configure GPG
         run: |
@@ -39,10 +42,9 @@ jobs:
       
       - name: Configure dput
         run: |
-          mkdir -p ~/.dput.cf.d
           cat > ~/.dput.cf << 'EOF'
           [DEFAULT]
-          login = username
+          login = ${{ secrets.LAUNCHPAD_USERNAME }}
           method = sftp
           hash_algo = sha256
           allow_unsigned_uploads = 0
