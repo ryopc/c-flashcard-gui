@@ -1,1 +1,18 @@
-.aider*
+# Build artifacts
+bin/
+obj/
+*.o
+*.a
+*.so
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

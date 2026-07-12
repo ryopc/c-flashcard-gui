@@ -1,0 +1,9 @@
+ls -la,List files with hidden files and details
+ps aux,Display running processes in detail
+df -h,Show disk usage in human-readable format
+man,Display manual pages for commands
+grep,Search text patterns in files
+find,Find files by name or attributes
+tar,Archive and compress files
+gzip,Compress files with gzip
+unzip,Extract zip archives
