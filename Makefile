@@ -1,29 +1,58 @@
-CC ?= gcc
-CFLAGS ?= -O2 -Wall
-PKG_CONFIG ?= pkg-config
-PREFIX ?= /usr/local
+.PHONY: all linux windows clean help
 
-GTK_CFLAGS = $(shell $(PKG_CONFIG) --cflags gtk+-3.0)
-GTK_LIBS = $(shell $(PKG_CONFIG) --libs gtk+-3.0)
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c11 -O2 -fPIC
+LDFLAGS = -lm
 
-all: flashcard
+LINUX_CFLAGS = $(CFLAGS) $(shell pkg-config --cflags raylib)
+LINUX_LDFLAGS = $(LDFLAGS) $(shell pkg-config --libs raylib)
 
-flashcard: main.c
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) main.c -o flashcard $(GTK_LIBS)
+WINDOWS_CC = x86_64-w64-mingw32-gcc
+WINDOWS_CFLAGS = $(CFLAGS) -I$(RAYLIB_WINDOWS_PATH)/include
+WINDOWS_LDFLAGS = -L$(RAYLIB_WINDOWS_PATH)/lib -lraylib -lgdi32 -lwinmm -lpthread
 
-install: flashcard
-	install -d $(DESTDIR)$(PREFIX)/bin
-	install -m 755 flashcard $(DESTDIR)$(PREFIX)/bin/flashcard
-	install -d $(DESTDIR)$(PREFIX)/share/applications
-	install -m 644 com.ryopc.Flashcard.desktop $(DESTDIR)$(PREFIX)/share/applications/com.ryopc.Flashcard.desktop
-	install -d $(DESTDIR)$(PREFIX)/share/metainfo
-	install -m 644 com.ryopc.Flashcard.appdata.xml $(DESTDIR)$(PREFIX)/share/metainfo/com.ryopc.Flashcard.appdata.xml
-	install -d $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps
-	install -m 644 com.ryopc.Flashcard.png $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/com.ryopc.Flashcard.png
-	install -d $(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps
-	install -m 644 com.ryopc.Flashcard.png $(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/com.ryopc.Flashcard.png
+SRCS = src/main.c src/flashcard.c
+OBJS_LINUX = obj/linux/main.o obj/linux/flashcard.o
+OBJS_WINDOWS = obj/windows/main.o obj/windows/flashcard.o
+
+TARGET_LINUX = bin/flashcard
+TARGET_WINDOWS = bin/flashcard.exe
+
+all: linux
+
+linux: $(TARGET_LINUX)
+
+windows: $(TARGET_WINDOWS)
+
+$(TARGET_LINUX): $(OBJS_LINUX) | bin
+	$(CC) -o $@ $^ $(LINUX_LDFLAGS)
+	@echo "✓ Linux build complete: $@"
+
+$(TARGET_WINDOWS): $(OBJS_WINDOWS) | bin
+	$(WINDOWS_CC) -o $@ $^ $(WINDOWS_LDFLAGS)
+	@echo "✓ Windows build complete: $@"
+
+obj/linux/%.o: src/%.c | obj/linux
+	$(CC) $(LINUX_CFLAGS) -c $< -o $@
+
+obj/windows/%.o: src/%.c | obj/windows
+	$(WINDOWS_CC) $(WINDOWS_CFLAGS) -c $< -o $@
+
+bin obj/linux obj/windows:
+	@mkdir -p $@
 
 clean:
-	rm -f flashcard
+	@rm -rf obj bin
+	@echo "✓ Cleaned"
 
-.PHONY: all install clean
+help:
+	@echo "Flashcard Builder (Raylib Edition)"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  make              - Build for Linux (default)"
+	@echo "  make windows      - Cross-compile for Windows (requires x86_64-w64-mingw32-gcc)"
+	@echo "  make clean        - Remove build artifacts"
+	@echo "  make help         - Show this message"
+	@echo ""
+	@echo "For Windows cross-compilation, set RAYLIB_WINDOWS_PATH:"
+	@echo "  RAYLIB_WINDOWS_PATH=/path/to/raylib make windows"
